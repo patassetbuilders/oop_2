@@ -4,10 +4,10 @@ class Vehicle
   @@number_of_vehicles = 0
   
   def self.number_of_vehicles
-    puts "This program has created #{@@number_of_vehicles} vehicle"
+    @@number_of_vehicles
   end
   
-  def initialize
+  def initialize(one,two,three)
     @@number_of_vehicles += 1
   end
   
@@ -29,7 +29,7 @@ class MyCar < Vehicle
   NUMBER_OF_DOORS = 4
   
   def initialize(year,  model, color)
-    super
+    super(year, model, color)
     @year = year
     @model = model
     @color = color
@@ -114,7 +114,7 @@ MyCar.mileage(7, 100) #class method
 
 puts first_car.inspect
 
-big_truck = Truck.new
+big_truck = Truck.new(1972, 'big truck', 'red')
 
 puts big_truck.inspect
 
