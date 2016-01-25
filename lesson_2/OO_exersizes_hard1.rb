@@ -74,20 +74,28 @@ class Motorcycle < WheeledVehicle
   end
 end
 
-class Catamaran
-  include Moveable
-  attr_accessor :propeller_count, :hull_count #note :range is a method not an instance variable
 
+class Seacraft
+  include Moveable
+  
   def initialize(num_propellers, num_hulls, km_traveled_per_liter, liters_of_fuel_capacity)
     @propeller_count = num_propellers
     @hull_count = num_hulls
     @fuel_capacity = liters_of_fuel_capacity
     @fuel_efficiency = km_traveled_per_liter
-    @range = self.range# ... code omitted ...
+    @range = self.range + 10# ... code omitted ...
   end
+  
+  
 end
 
-class Motorboat < Catamaran
+class Catamaran < Seacraft
+  include Moveable
+  attr_accessor :propeller_count, :hull_count #note :range is a method not an instance variable
+
+end
+
+class Motorboat < Seacraft
   def initialize ( km_traveled_per_liter, liters_of_fuel_capacity )
     super(1,1, km_traveled_per_liter, liters_of_fuel_capacity )
   end
