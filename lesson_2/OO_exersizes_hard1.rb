@@ -35,11 +35,7 @@ module Moveable
   attr_accessor :range, :fuel_capacity, :fuel_efficiency
   
   def range
-    if self.class.ancestors.to_s.include?('Seacraft')
-      @fuel_capacity * @fuel_efficiency + 10 #includes 10km for drift
-    else
        @fuel_capacity * @fuel_efficiency
-    end
   end
 end
 
@@ -89,6 +85,11 @@ class Seacraft
     @range = self.range 
   end
   
+  def range
+    drift = 10
+    range_using_fuel = super
+    range_using_fuel + drift
+  end
   
 end
 
@@ -113,7 +114,3 @@ puts "my_boat has a range of #{my_boat.range}"
 
 my_motorboat = Motorboat.new(3, 400)
 puts "my_motorboat  has a range of #{my_motorboat.range}"
-
-
-
-binding.pry
