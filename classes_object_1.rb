@@ -1,4 +1,15 @@
 require 'pry'
+require 'time'
+
+module Truckable
+  def blast_air_horn(time)
+    air_horn = 'Ba'
+    time.times do
+     air_horn += 'a'
+    end
+    air_horn += 'h!'
+  end
+end
 
 class Vehicle
   @@number_of_vehicles = 0
@@ -13,36 +24,6 @@ class Vehicle
   
   def self.mileage(liters, km) #class method
     puts "#{liters / (km / 100) } liters / 100 km"
-  end
-end
-
-
-class Truck < Vehicle
- NUMBER_OF_DOORS = 2
-end
-
-class MyCar < Vehicle
-  
-  attr_accessor :color, :current_speed, :engine
-  attr_reader :year, :model
-
-  NUMBER_OF_DOORS = 4
-  
-  def initialize(year,  model, color)
-    super()
-    @year = year
-    @model = model
-    @color = color
-    @current_speed = 0
-    @engine = 'off'
-  end
-  
-  def to_s
-    "My car is a #{color}, #{year}, #{@model}!"
-  end
-  
-  def show_year
-   puts "year is #{self.year}"
   end
   
   def spray_paint(new_color)
@@ -83,11 +64,52 @@ class MyCar < Vehicle
     sleep(0.5)
   end
   
+end
+
+
+class Truck < Vehicle
+  include Truckable
+  NUMBER_OF_DOORS = 2
+end
+
+class MyCar < Vehicle
+  
+  attr_accessor :color, :current_speed, :engine
+  attr_reader :year, :model
+
+  NUMBER_OF_DOORS = 4
+  
+  def initialize(year,  model, color)
+    super()
+    @year = year
+    @model = model
+    @color = color
+    @current_speed = 0
+    @engine = 'off'
+  end
+  
+  def to_s
+    "My car is a #{color}, #{year}, #{@model}!"
+  end
+  
+  def show_year
+   puts "year is #{self.year}"
+  end
+  
   def stop
     @current_speed = 0
     puts "Stopping Car  - speed is now #{@current_speed} km/hr" 
   end
+  
+  def age
+    "Your #{self.model} is #{how_old} years old"
+  end
 
+  private
+  
+  def how_old
+    Time.now.year - self.year
+  end
 
 end
 
@@ -110,17 +132,49 @@ puts first_car.spray_paint('red')
 
 puts first_car.show_year
 
+puts first_car.age
+
 MyCar.mileage(7, 100) #class method
 
 puts first_car.inspect
 
 big_truck = Truck.new()
+puts "Big truck says #{big_truck.blast_air_horn(6)}"
 
 puts big_truck.inspect
 
-puts Vehicle.number_of_vehicles
+puts "Total number of vehicles is #{Vehicle.number_of_vehicles}"
 
-binding.pry
+puts "Exersize 4 - method look up"
+puts MyCar.class.ancestors
+
+puts "======== Exersize 7 ============="
+
+class Student
+
+  def initialize(name, grade)
+    @name = name
+    @grade = grade
+  end
+  
+  def better_grade_than?(other_student)
+    self.grade > other_student.grade
+  end
+
+  protected
+
+  def grade
+    @grade
+  end
+
+end
+
+joe = Student.new("Joe", 90)
+bob = Student.new("Bob", 84)
+puts "Well done!" if joe.better_grade_than?(bob)
+
+system 'clear'
+puts system 'ls'
 
 # class Person
 #   attr_accessor :name

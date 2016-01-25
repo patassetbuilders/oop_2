@@ -1,0 +1,161 @@
+require 'pry'
+class Greeting
+  def greet(message)
+    puts message
+  end
+end
+
+class Hello < Greeting
+  def self.hi
+    puts "i am the Hi class method"
+  end
+  
+  def hi
+    greet("Hello")
+  end
+end
+
+class Goodbye < Greeting
+  def bye
+    greet("Goodbye")
+  end
+end
+
+# case 1
+hello = Hello.new
+ hello.hi  # => Hello
+# hello is an instance of the Hello class and a sub class of Greeting
+# hello.hi calls the Hi method of the Hello class which then
+# passes the 'Hello' literal strng to the greet method in the Greeting Class, this
+# puts the message to the screen and returns nil
+
+# case 2
+hello = Hello.new
+#hello.bye  # => undefined method bye for hello
+# inheritance is up the look up chain
+
+# case 3
+hello = Hello.new
+# hello.greet  # => wrong number of arguments
+# hello calls the greet method but does not pass in any arguments
+hello.greet('Long time no see') # works
+
+#case 4
+hello = Hello.new
+hello.greet("Goodbye") # doisplays Goodbye and returns nil
+
+#case 5 
+ Hello.hi  #hi is not a class method, so no method error, 
+# hi can only be called in an instance of the Hello class 
+
+# question 2
+# create a hi class method as shown above
+
+# question 3
+class AngryCat
+  def initialize(age, name)
+    @age  = age
+    @name = name 
+  end
+
+  def age
+    puts @age
+  end
+
+  def name
+    puts @name
+  end
+
+  def hiss
+    puts "Hisssss!!!"
+  end
+end
+
+# call the new class and pass in the appropriate age and name arguments
+
+bella = AngryCat.new(2, 'Bella')
+orion = AngryCat.new(4, 'Orion')
+
+puts bella.inspect
+puts orion.inspect
+
+# question 4
+class Cat
+  def initialize(type)
+    @type = type
+  end
+  
+  def to_s
+    puts "I am a #{@type} cat"
+  end
+
+end
+
+cat_1 = Cat.new('tabby')
+cat_1.to_s
+
+# better to create a new method display_type rather
+# than modify the to_s method
+
+# Question 5
+# class methods cannot be called on instances and
+# vica versa instant methods cannot be called on a class
+
+class Television
+  def self.manufacturer
+    # method logic
+    puts 'Manufacturer'
+  end 
+
+  def model
+    # method logic
+    puts 'model'
+  end
+end
+
+tv = Television.new
+#tv.man ufacturer
+tv.model
+
+Television.manufacturer
+#Television.model
+
+# Question 6
+class Cat
+  attr_accessor :type, :age
+
+  def initialize(type)
+    @type = type
+    @age  = 0
+  end
+
+  def make_one_year_older
+    @age += 1
+  end
+end
+
+pussy = Cat.new('old')
+puts pussy.age
+pussy.make_one_year_older
+puts pussy.age
+# replace the attr_accessor with the instance variable as shown
+
+# question 7
+class Light
+  attr_accessor :brightness, :color
+
+  def initialize(brightness, color)
+    @brightness = brightness
+    @color = color 
+  end
+
+  def self.information
+   "I want to turn on the light with a brightness level of super high and a colour of green"
+  end
+
+end
+
+puts Light.information
+# return in self.information is unnecessary
+light_1 = Light.new('dim', 'blue')
+puts light_1.inspect
