@@ -202,7 +202,7 @@ class TTTGame
       human.number_of_wins += 1
     when computer.marker
       puts "Computer won"
-      human.number_of_wins += 1
+      computer.number_of_wins += 1
     else
       puts "Its a tie"
     end
