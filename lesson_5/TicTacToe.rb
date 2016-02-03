@@ -7,6 +7,8 @@
 # Noun player, game, board, square, mark
 # Verb play_game, mark_grid
 
+require 'pry'
+
 class Board
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
@@ -38,6 +40,14 @@ class Board
 
   def unmarked_keys
     @squares.keys.select { |key| @squares[key].unmarked? }
+  end
+  
+  def joinor 
+    if unmarked_keys.size > 1
+      unmarked_keys[0..(unmarked_keys.size - 2)].join(', ') + ' or ' + unmarked_keys.last.to_s
+    else
+      unmarked_keys.last.to_s
+    end
   end
 
   def full?
@@ -93,11 +103,14 @@ class Square
   end
 end
 
+
 class Player
   attr_reader :marker
+  attr_accessor :number_of_wins
 
   def initialize(marker)
     @marker = marker
+    @number_of_wins = 0
   end
 end
 
@@ -138,7 +151,7 @@ class TTTGame
   end
 
   def current_player_moves
-    if @current_marker == MUMAN_MARKER
+    if @current_marker == HUMAN_MARKER
       human_moves
       @current_marker = COMPUTER_MARKER
     else
@@ -149,7 +162,7 @@ class TTTGame
 
   def display_welcome_message
     clear
-    puts "Welcome to Tic Tac Toe"
+    puts "Welcome to Tic Tac Toe - Winner is first to 5"
     puts ''
   end
 
@@ -167,7 +180,7 @@ class TTTGame
 
   def human_moves
     puts "Your move!"
-    puts "Choose one of the following squares (#{@board.unmarked_keys.join(', ')}) "
+    puts "Choose one of the following squares (#{@board.joinor})"
     square = nil
     loop do
       square = gets.chomp.to_i
@@ -186,11 +199,14 @@ class TTTGame
     case board.winning_marker
     when human.marker
       puts "You won!"
+      human.number_of_wins += 1
     when computer.marker
       puts "Computer won"
+      human.number_of_wins += 1
     else
       puts "Its a tie"
     end
+    puts "Current score You #{human.number_of_wins} V Computer #{computer.number_of_wins}" 
   end
 
   def game_reset
