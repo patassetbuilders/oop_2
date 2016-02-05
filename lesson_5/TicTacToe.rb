@@ -67,12 +67,61 @@ class Board
     end
     nil
   end
+  
+  def at_risk_square
+    WINNING_LINES.each do |line|
+      squares = @squares.values_at(*line)
+      if human_has_two_squares?(squares)
+        squares.each do |square| 
+          if square.marker == Square::INITIAL_MARKER
+            return @squares.key(square)
+          end
+        end
+      end
+    end
+    nil
+  end
+  
+  
+  def has_advantage_square
+    WINNING_LINES.each do |line|
+      squares = @squares.values_at(*line)
+      if computer_has_two_squares?(squares)
+        squares.each do |square| 
+          if square.marker == Square::INITIAL_MARKER
+            return @squares.key(square)
+          end
+        end
+      end
+    end
+    nil
+  end
+  
 
   def reset
     (1..9).each { |key| @squares[key] = Square.new }
   end
 
   private
+
+  def computer_has_two_squares?(squares)
+     markers = squares.select(&:computer_marker?).collect(&:marker)
+     if markers.size == 2
+       return true
+     else
+       return false
+     end
+  end
+
+  
+  def human_has_two_squares?(squares)
+     markers = squares.select(&:human_marker?).collect(&:marker)
+     if markers.size == 2
+       return true
+     else
+       return false
+     end
+  end
 
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
@@ -92,6 +141,10 @@ class Square
 
   def to_s
     @marker
+  end
+  
+  def human_marker?
+    marker == TTTGame::HUMAN_MARKER
   end
 
   def marked?
@@ -139,7 +192,6 @@ class TTTGame
           clear_screen_and_display_board
         end
         update_score
-        
         display_result
         game_reset
         break if match_over? 
@@ -198,7 +250,11 @@ class TTTGame
   end
 
   def computer_moves
-    board.[]=(board.unmarked_keys.sample, computer.marker)
+    if board.at_risk_square
+      board.[]=(board.at_risk_square, computer.marker)
+    else
+      board.[]=(board.unmarked_keys.sample, computer.marker)
+    end
   end
   
   def update_score
