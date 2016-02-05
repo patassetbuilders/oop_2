@@ -147,6 +147,10 @@ class Square
     marker == TTTGame::HUMAN_MARKER
   end
 
+  def computer_marker?
+    marker == TTTGame::COMPUTER_MARKER
+  end
+
   def marked?
     marker != INITIAL_MARKER
   end
@@ -250,7 +254,9 @@ class TTTGame
   end
 
   def computer_moves
-    if board.at_risk_square
+    if board.has_advantage_square
+      board.[]=(board.has_advantage_square, computer.marker)
+    elsif board.at_risk_square
       board.[]=(board.at_risk_square, computer.marker)
     else
       board.[]=(board.unmarked_keys.sample, computer.marker)
