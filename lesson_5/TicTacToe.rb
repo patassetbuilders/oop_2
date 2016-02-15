@@ -68,14 +68,12 @@ class Board
     nil
   end
   
-  def at_risk_square
+  def at_risk_square  # does not read as well as has_advantage_square IMH
     WINNING_LINES.each do |line|
       squares = @squares.values_at(*line)
-      if human_has_two_squares?(squares)
+      if squares.select(&:human_marker?).collect(&:marker).size == 2
         squares.each do |square| 
-          if square.marker == Square::INITIAL_MARKER
-            return @squares.key(square)
-          end
+          return @squares.key(square) if square.unmarked?
         end
       end
     end
@@ -88,7 +86,7 @@ class Board
       squares = @squares.values_at(*line)
       if computer_has_two_squares?(squares)
         squares.each do |square| 
-          if square.marker == Square::INITIAL_MARKER
+          if square.unmarked?  # reads better than above
             return @squares.key(square)
           end
         end
@@ -104,7 +102,7 @@ class Board
 
   private
 
-  def computer_has_two_squares?(squares)
+  def computer_has_two_squares?(squares) # not used incorporated into at_risk_square
      markers = squares.select(&:computer_marker?).collect(&:marker)
      if markers.size == 2
        return true
@@ -163,12 +161,13 @@ end
 
 class Player
   attr_reader :marker
-  attr_accessor :number_of_wins
+  attr_accessor :number_of_wins, :name
 
   def initialize(marker)
     @marker = marker
     @number_of_wins = 0
   end
+  
 end
 
 class TTTGame
@@ -187,6 +186,7 @@ class TTTGame
 
   def play
     display_welcome_message
+   # player.set_up_players
     loop do # play again 
       loop do # first to five
         display_board
