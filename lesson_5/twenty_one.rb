@@ -27,9 +27,14 @@
 
 require 'pry'
 
-class Player
+
+class Participant
+  
+  attr_accessor :name, :hand, :score
+  
   def initialize
-    #name, #score #busted
+    @score = 0 #name, #score #busted
+    @hand = []
   end
   
   def flip
@@ -37,20 +42,19 @@ class Player
   
   def sit
   end
+  
+  def busted?
+  end
 
 end
 
-class Dealer
-  def initiaize
-    #score, #busted
-  end
-  
-  def flip
-  end
-  
-  def sit
-  end
-end
+ class Player < Participant
+ 
+ end
+
+ class Dealer < Participant
+ 
+ end
 
 class Card
 
@@ -60,10 +64,7 @@ class Deck
   SUIT = %w[D H S C]
   PICTURE = %w[J Q K A] 
   attr_accessor :cards
-  # sets up deck 52 cards
-  # keeps track of cards to go
-  # could go array 52 elements sample with removal
-  # deals a card
+
   def initialize
     @cards = []
     SUIT.each do |suit|
@@ -76,11 +77,15 @@ class Deck
         @cards << picture_card 
       end
     end 
-    @cards
+    @cards = @cards.shuffle
   end
   
   def deal
     @cards.pop
+  end
+  
+  def cards_left
+    @cards.size
   end
   
 end
@@ -88,23 +93,36 @@ end
 
 
 class Game
+  attr_accessor :deck, :player, :dealer
   
   def initialize
-
+    @deck = Deck.new
+    @player = Player.new
+    @dealer = Dealer.new
   end
   
   def play
     welcome_players
-    
- #  deal cards
- #  human plays
- #  dealer plays
- #  display result
+    2.times{ deal_player_card }
+    deal_dealer_card
+    display_hands
   end
   
   def welcome_players
-    puts "Hi welcome to twenty one"
+    puts "Hi welcome to Twenty One"
   end
+  
+ def deal_player_card
+   @player.hand << @deck.deal
+ end
+  
+  def deal_dealer_card
+    @dealer.hand << @deck.deal
+ end
+  
+ def display_hands
+   puts "Dealers Hand #{@dealer.hand.join(', ')}  Your Hand #{@player.hand.join(', ')}"
+ end
   
 end
 
