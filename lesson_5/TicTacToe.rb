@@ -71,6 +71,8 @@ class Board
   def at_risk_square  # does not read as well as has_advantage_square IMH
     WINNING_LINES.each do |line|
       squares = @squares.values_at(*line)
+      if computer_has_two_squares?(squares)
+      
       if squares.select(&:human_marker?).collect(&:marker).size == 2
         squares.each do |square| 
           return @squares.key(square) if square.unmarked?

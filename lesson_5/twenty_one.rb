@@ -1,66 +1,55 @@
-
-
-# This simplified version of the card game Twenty One.
-
-# The cage consistes of two participants, the player and the def dealer
-# The objective to the game is for the participants to get as close to twenty one without going over. 
-# If they go over they bust or loose, if neither player goes over the player closest to 21 wins.
-
-# How tthe game is played
-
-# The dealer deals each player two cards from a 52 card def deck
-# The dealer also deals themselves one card.
-
-# The player then decides to either flip i.e. recieve and extra card ot sit.
-# Once the player sits, the dealer plays
-# The dealer can only sit if they are at least 17
-  
-# At the end of the round, the used cards are not returned to the deck.
-
-
-# Score, Ace may be 1 or 11, picture cards are 10 all other cards are their face value. 
-# At the end of each hand, the used cards are discarded, i.e not returned to the deck. 
-
-#Nouns   - Player, Deck, Hand, Card, Game
-#Verb    - Deal, flip, sit
-#Attributes 
-
 require 'pry'
 
-
 class Participant
-  
+
   attr_accessor :name, :hand, :score
-  
+
   def initialize
-    @score = 0 #name, #score #busted
+    @score = 0
     @hand = []
   end
-  
-  def flip
+
+  def sum_hand
+    hand_total = 0
+    aces = []
+    @hand.each do |card|
+      if card.to_i != 0
+        hand_total += card.to_i # number card
+      elsif
+        card.start_with?('A') # ace
+        hand_total += 11
+        aces << card
+      else
+        hand_total += 10 # picture card
+      end
+    end
+    aces.each do
+      hand_total -= 10 if hand_total > 21
+    end
+    hand_total
   end
-  
-  def sit
-  end
-  
+
   def busted?
+     sum_hand > 21
+   end
+end
+
+class Player < Participant
+  def sit_or_flip?
+    valid_choice = %w[ F S]
+    loop do
+      puts "What is your next move ? Flip or Sit (Enter F or S)" # deal another card or change players
+      choice = gets.chomp.upcase
+      return choice if valid_choice.include?(choice)
+      puts "That is not a valid choice"
+    end
   end
-
 end
 
- class Player < Participant
- 
- end
-
- class Dealer < Participant
- 
- end
-
-class Card
-
+class Dealer < Participant
 end
 
-class Deck 
+class Deck
   SUIT = %w[D H S C]
   PICTURE = %w[J Q K A] 
   attr_accessor :cards
@@ -74,58 +63,120 @@ class Deck
       end
       PICTURE.each do |picture|
         picture_card = picture + suit
-        @cards << picture_card 
+        @cards << picture_card
       end
-    end 
+    end
     @cards = @cards.shuffle
   end
   
-  def deal
-    @cards.pop
+  def deal(player)
+    player.hand << @cards
   end
-  
+
   def cards_left
     @cards.size
   end
-  
 end
-
-
 
 class Game
   attr_accessor :deck, :player, :dealer
-  
+
   def initialize
     @deck = Deck.new
     @player = Player.new
     @dealer = Dealer.new
   end
-  
+
   def play
     welcome_players
-    2.times{ deal_player_card }
-    deal_dealer_card
+    loop do # hand loop
+    initial_deal
+    loop do
+      break if @player.busted? || @player.sit_or_flip? == 'S'
+      @deck.deal(@player)
+      display_hands
+    end
+    loop do 
+      break if @dealer.busted? || @dealer.sum_hand >= 17
+      @deck.deal(@dealer)
+      display_hands
+      sleep(2)
+    end
+    display_hands
+    determine_winner
+    display_winner
+    update_score
+    display_score
+    sleep(3)
+    break if @deck.cards_left < 10
+  end
+  system 'clear'
+  puts "Game over - Final score"
+  display_score
+  end
+
+  def welcome_players
+    system 'clear'
+    puts "Hi"
+    puts "Welcome to Twenty One"
+  end
+
+  def initial_deal
+    system 'clear' if @deck.cards_left < 50
+    puts "Dealing Cards"
+    sleep(2)
+    @player.hand = []
+    @dealer.hand = []
+    2.times{ @deck.deal(@player) }
+    @deck.deal(@dealer)
     display_hands
   end
-  
-  def welcome_players
-    puts "Hi welcome to Twenty One"
+ 
+  def display_hands
+    system 'clear' if @deck.cards_left < 49
+    puts ""
+    puts "Your Hand    #{@player.hand.join(', ')} = #{@player.sum_hand} #{'Player Busted' if @player.busted?}"
+    puts "Dealers Hand #{@dealer.hand.join(', ')} = #{@dealer.sum_hand} #{'Dealer Flips' if @dealer.hand.size > 1 && @dealer.sum_hand < 17} #{'Dealer Busted' if @dealer.busted?} #{'Dealer sits' if !@dealer.busted? && @dealer.sum_hand >= 17}  " 
+    puts ""
   end
-  
- def deal_player_card
-   @player.hand << @deck.deal
- end
-  
-  def deal_dealer_card
-    @dealer.hand << @deck.deal
- end
-  
- def display_hands
-   puts "Dealers Hand #{@dealer.hand.join(', ')}  Your Hand #{@player.hand.join(', ')}"
- end
-  
+
+  def determine_winner # not correct
+    if @player.busted?
+      return @dealer
+    elsif @dealer.busted? && !@player.busted?
+      return @player
+    elsif !@dealer.busted? && !@player.busted? && @dealer.sum_hand > @player.sum_hand
+      return @player 
+    elsif @player.sum_hand == @dealer.sum_hand 
+      return nil
+    else
+      return @player
+    end
+  end
+
+  def update_score
+    if determine_winner == @dealer
+      @dealer.score += 1
+    elsif determine_winner == @player
+      @player.score += 1
+    end
+  end
+
+  def display_winner
+    if determine_winner == @dealer
+      puts "Dealer WON!!" 
+    elsif determine_winner == @player
+      puts "You WON!!"
+    else
+      puts "Tied Hand"
+    end
+    # should I call display score from here or from play game
+  end
+
+  def display_score
+    puts "Score You #{@player.score} Dealer #{@dealer.score}"
+  end
 end
 
 game = Game.new
 game.play
-binding.pry
