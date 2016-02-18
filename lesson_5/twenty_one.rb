@@ -70,7 +70,7 @@ class Deck
   end
   
   def deal(player)
-    player.hand << @cards
+    player.hand << @cards.pop
   end
 
   def cards_left
