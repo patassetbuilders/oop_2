@@ -1,13 +1,7 @@
 # tewenty one
 require 'pry'
-class Participant
-  attr_accessor :name, :hand, :score
 
-  def initialize
-    @score = 0
-    @hand = []
-  end
-
+module Hand
   def sum_hand
     hand_total = 0
     aces = []
@@ -40,6 +34,19 @@ class Participant
   def at_least_seventeen?
     sum_hand >= 17
   end
+
+
+end
+class Participant
+  attr_accessor :name, :hand, :score
+
+  def initialize
+    @score = 0
+    @hand = []
+  end
+
+  include Hand
+ 
 end
 
 class Player < Participant
