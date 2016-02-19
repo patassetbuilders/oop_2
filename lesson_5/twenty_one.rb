@@ -95,7 +95,7 @@ class Deck
   end
 
   def first_round?
-    cards_left > 49
+    cards_left == 52
   end
 end
 
@@ -148,7 +148,7 @@ class Game
   end
 
   def initial_deal
-    system 'clear' if @deck.first_round?
+    system 'clear' unless @deck.first_round?
     puts "Dealing Cards"
     sleep(2)
     @player.hand = []
@@ -165,7 +165,7 @@ class Game
   end
 
   def display_hands
-    system 'clear' if @deck.cards_left < 49
+    system 'clear' unless @deck.first_round?
     puts ""
     puts "Your Hand    #{@player.hand.join(', ')} = #{@player.sum_hand} #{'Player Busted' if @player.busted?}"
     puts "Dealers Hand #{@dealer.hand.join(', ')} = #{@dealer.sum_hand} #{'Dealer Flips' if @dealer.hand.size > 1 && @dealer.sum_hand < 17} #{'Dealer Busted' if @dealer.busted?} #{'Dealer sits' if !@dealer.busted? && @dealer.sum_hand >= 17}  "
