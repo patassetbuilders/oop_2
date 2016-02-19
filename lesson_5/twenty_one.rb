@@ -20,7 +20,7 @@ class Participant
         hand_total += 10 # picture card
       end
     end
-    aces.each do
+    aces.count.times do
       hand_total -= 10 if hand_total > 21
     end
     hand_total
@@ -55,7 +55,7 @@ class Deck
     @cards = []
     SUIT.each do |suit|
       (2..10).each do |number|
-        number_card = number.to_s + suit
+        number_card = "#{number}#{suit}"
         @cards << number_card
       end
       PICTURE.each do |picture|
