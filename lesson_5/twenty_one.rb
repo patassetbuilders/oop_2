@@ -1,4 +1,5 @@
 # tewenty one
+require 'pry'
 class Participant
   attr_accessor :name, :hand, :score
 
@@ -10,6 +11,7 @@ class Participant
   def sum_hand
     hand_total = 0
     aces = []
+    
     @hand.each do |card|
       if card.to_i != 0
         hand_total += card.to_i # number card
@@ -20,6 +22,7 @@ class Participant
         hand_total += 10 # picture card
       end
     end
+    
     aces.count.times do
       hand_total -= 10 if hand_total > 21
     end
@@ -29,16 +32,29 @@ class Participant
   def busted?
     sum_hand > 21
   end
+  
+  def twenty_one?
+    sum_hand == 21
+  end
+  
+  def at_least_seventeen?
+    sum_hand >= 17
+  end
 end
 
 class Player < Participant
-  def sit_or_flip?
+  def sit?
     valid_choice = %w(F S)
     loop do
       puts "What is your next move ? Flip or Sit (Enter F or S)" # deal another card or change players
       choice = gets.chomp.upcase
-      return choice if valid_choice.include?(choice)
-      puts "That is not a valid choice"
+      if choice.include? 'S'
+        return true
+      elsif choice.include? 'F'
+        return false 
+      else
+        puts "That is not a valid choice"
+      end
     end
   end
 end
@@ -73,6 +89,14 @@ class Deck
   def cards_left
     @cards.size
   end
+  
+  def almost_empty?
+   cards_left < 10
+  end
+
+  def first_round?
+    cards_left > 49
+  end
 end
 
 class Game
@@ -86,30 +110,32 @@ class Game
 
   def play
     welcome_players
-    loop do # hand loop
+    loop do # continue playing next hand
       initial_deal
+      
       loop do
-        break if @player.sum_hand >= 21 || @player.sit_or_flip? == 'S' 
-        # could have had
-        # breaf if @player.busted? || @player.sum_hand = 21 || @player.sit? (different method required)
-        # Appreciate your comments on which you feel is the best way to go and why?
+        break if @player.busted? || @player.twenty_one? || @player.sit?
         @deck.deal(@player)
         display_hands
       end
+      
       loop do
-        break if @dealer.sum_hand >= 17
+        break if @dealer.at_least_seventeen?
         @deck.deal(@dealer)
         display_hands
         sleep(2)
       end
+      
       display_hands
       determine_winner
       display_winner
       update_score
       display_score
       sleep(3)
-      break if @deck.cards_left < 10
+      break if @deck.almost_empty?
+      break unless continue?
     end
+    
     system 'clear'
     puts "Game over - Final score"
     display_score
@@ -122,7 +148,7 @@ class Game
   end
 
   def initial_deal
-    system 'clear' if @deck.cards_left < 50
+    system 'clear' if @deck.first_round?
     puts "Dealing Cards"
     sleep(2)
     @player.hand = []
@@ -130,6 +156,12 @@ class Game
     2.times { @deck.deal(@player) }
     @deck.deal(@dealer)
     display_hands
+  end
+  
+  def continue?
+    puts "Play another hand? Y or N"
+    continue = gets.chomp.upcase
+    return true if continue == "Y"
   end
 
   def display_hands
@@ -170,7 +202,6 @@ class Game
     else
       puts "Tied Hand"
     end
-    # should I call display score from here or from play game
   end
 
   def display_score
