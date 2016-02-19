@@ -1,7 +1,6 @@
 require 'pry'
 
 class Participant
-
   attr_accessor :name, :hand, :score
 
   def initialize
@@ -15,8 +14,7 @@ class Participant
     @hand.each do |card|
       if card.to_i != 0
         hand_total += card.to_i # number card
-      elsif
-        card.start_with?('A') # ace
+      elsif card.start_with?('A') # ace
         hand_total += 11
         aces << card
       else
@@ -30,13 +28,13 @@ class Participant
   end
 
   def busted?
-     sum_hand > 21
-   end
+    sum_hand > 21
+  end
 end
 
 class Player < Participant
   def sit_or_flip?
-    valid_choice = %w[ F S]
+    valid_choice = %w(F S)
     loop do
       puts "What is your next move ? Flip or Sit (Enter F or S)" # deal another card or change players
       choice = gets.chomp.upcase
@@ -50,8 +48,8 @@ class Dealer < Participant
 end
 
 class Deck
-  SUIT = %w[D H S C]
-  PICTURE = %w[J Q K A] 
+  SUIT = %w(D H S C)
+  PICTURE = %w(J Q K A)
   attr_accessor :cards
 
   def initialize
@@ -68,7 +66,7 @@ class Deck
     end
     @cards = @cards.shuffle
   end
-  
+
   def deal(player)
     player.hand << @cards.pop
   end
@@ -90,29 +88,32 @@ class Game
   def play
     welcome_players
     loop do # hand loop
-    initial_deal
-    loop do
-      break if @player.busted? || @player.sit_or_flip? == 'S'
-      @deck.deal(@player)
+      initial_deal
+      loop do
+        break if @player.sum_hand >= 21 || @player.sit_or_flip? == 'S' 
+        # could have had
+        # breaf if @player.busted? || @player.sum_hand = 21 || @player.sit? (different method required)
+        # Appreciate your comments on which you feel is the best way to go and why?
+        @deck.deal(@player)
+        display_hands
+      end
+      loop do
+        break if @dealer.sum_hand >= 17
+        @deck.deal(@dealer)
+        display_hands
+        sleep(2)
+      end
       display_hands
+      determine_winner
+      display_winner
+      update_score
+      display_score
+      sleep(3)
+      break if @deck.cards_left < 10
     end
-    loop do 
-      break if @dealer.busted? || @dealer.sum_hand >= 17
-      @deck.deal(@dealer)
-      display_hands
-      sleep(2)
-    end
-    display_hands
-    determine_winner
-    display_winner
-    update_score
+    system 'clear'
+    puts "Game over - Final score"
     display_score
-    sleep(3)
-    break if @deck.cards_left < 10
-  end
-  system 'clear'
-  puts "Game over - Final score"
-  display_score
   end
 
   def welcome_players
@@ -127,16 +128,16 @@ class Game
     sleep(2)
     @player.hand = []
     @dealer.hand = []
-    2.times{ @deck.deal(@player) }
+    2.times { @deck.deal(@player) }
     @deck.deal(@dealer)
     display_hands
   end
- 
+
   def display_hands
     system 'clear' if @deck.cards_left < 49
     puts ""
     puts "Your Hand    #{@player.hand.join(', ')} = #{@player.sum_hand} #{'Player Busted' if @player.busted?}"
-    puts "Dealers Hand #{@dealer.hand.join(', ')} = #{@dealer.sum_hand} #{'Dealer Flips' if @dealer.hand.size > 1 && @dealer.sum_hand < 17} #{'Dealer Busted' if @dealer.busted?} #{'Dealer sits' if !@dealer.busted? && @dealer.sum_hand >= 17}  " 
+    puts "Dealers Hand #{@dealer.hand.join(', ')} = #{@dealer.sum_hand} #{'Dealer Flips' if @dealer.hand.size > 1 && @dealer.sum_hand < 17} #{'Dealer Busted' if @dealer.busted?} #{'Dealer sits' if !@dealer.busted? && @dealer.sum_hand >= 17}  "
     puts ""
   end
 
@@ -145,9 +146,9 @@ class Game
       return @dealer
     elsif @dealer.busted? && !@player.busted?
       return @player
-    elsif !@dealer.busted? && !@player.busted? && @dealer.sum_hand > @player.sum_hand
-      return @player 
-    elsif @player.sum_hand == @dealer.sum_hand 
+    elsif @dealer.sum_hand > @player.sum_hand
+      return @dealer
+    elsif @player.sum_hand == @dealer.sum_hand
       return nil
     else
       return @player
@@ -164,7 +165,7 @@ class Game
 
   def display_winner
     if determine_winner == @dealer
-      puts "Dealer WON!!" 
+      puts "Dealer WON!!"
     elsif determine_winner == @player
       puts "You WON!!"
     else
