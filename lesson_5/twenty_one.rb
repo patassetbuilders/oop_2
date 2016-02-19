@@ -1,5 +1,4 @@
-require 'pry'
-
+# tewenty one
 class Participant
   attr_accessor :name, :hand, :score
 
