@@ -167,8 +167,20 @@ class Game
   def display_hands
     system 'clear' unless @deck.first_round?
     puts ""
-    puts "Your Hand    #{@player.hand.join(', ')} = #{@player.sum_hand} #{'Player Busted' if @player.busted?}"
-    puts "Dealers Hand #{@dealer.hand.join(', ')} = #{@dealer.sum_hand} #{'Dealer Flips' if @dealer.hand.size > 1 && @dealer.sum_hand < 17} #{'Dealer Busted' if @dealer.busted?} #{'Dealer sits' if !@dealer.busted? && @dealer.sum_hand >= 17}  "
+    your_hand = 'Your Hand    '
+    your_hand += @player.hand.join(', ')
+    your_hand += " = #{@player.sum_hand}"
+    your_hand += " #{'Player Busted' if @player.busted?}"
+    puts your_hand
+    
+    dealers_hand = "Dealers Hand "
+    dealers_hand += @dealer.hand.join(', ')
+    dealers_hand += " = #{@dealer.sum_hand}"
+    dealers_hand += "#{' Dealer Flips' if @dealer.hand.size > 1 && @dealer.sum_hand < 17}"
+    dealers_hand += "#{' Dealer Busted' if @dealer.busted?}"
+    dealers_hand += "#{' Dealer sits' if !@dealer.busted? && @dealer.at_least_seventeen?} "
+    
+    puts dealers_hand
     puts ""
   end
 
